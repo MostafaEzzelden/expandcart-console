@@ -76,36 +76,34 @@ class Reader
 
     private function getFileContents($path)
     {
-        return file_get_contents($path);
+        return $this->formatFileContents(file_get_contents($path));
     }
 
     private function copyFile($path)
     {
         $fileContents = $this->getFileContents($path);
 
-        $this->formatFileContents($fileContents);
-
-        $pathToSave = $this->resolvePath($path);
+        $pathToSave = $this->resolvePathToStore($path);
 
         if (file_put_contents($pathToSave, $fileContents) === false) {
             return "There was a problem (permissions?) creating the file " . $pathToSave;
         }
 
-        return "Creating file - " . $pathToSave;
+        return "Creating file - $pathToSave" ;
     }
 
     private function deleteFile($path)
     {
-        $pathToDelete = $this->resolvePath($path);
+        $pathToDelete = $this->resolvePathToStore($path);
 
         if (!is_file($pathToDelete) || unlink($pathToDelete) === false) {
             return "Unable to delete the file " . $pathToDelete;
         }
 
-        return "Deleting file - " . $pathToDelete;
+        return "Deleting file - $pathToDelete";
     }
 
-    private function formatFileContents(string &$fileContents)
+    private function formatFileContents(string $fileContents)
     {
         // resolve class name
         $fileContents = str_replace('__class__', array_reduce(explode('_', $this->moduleName), function ($carry, $slug) {
@@ -114,9 +112,11 @@ class Reader
 
         // resolve module name
         $fileContents = str_replace('__name__', $this->moduleName, $fileContents);
+
+        return $fileContents;
     }
 
-    private function resolvePath(string $path)
+    private function resolvePathToStore(string $path)
     {
         $path =  str_replace($this->baseTemplateDir . '/' . $this->templateDir . '/', '', $path);
 

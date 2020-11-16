@@ -23,7 +23,7 @@ class ShippingCommand extends Command
             ->setModuleName($moduleName)
             ->createResources();
 
-        $output .= PHP_EOL . 'Successfully created ' . $moduleName . ' files.';
+        $output .= PHP_EOL . 'Successfully created ' . $moduleName . ' shipping.';
         return $output;
     }
 
@@ -38,7 +38,7 @@ class ShippingCommand extends Command
             ->setModuleName($moduleName)
             ->deleteResources();
 
-        $output .= PHP_EOL . 'Successfully deleted ' . $moduleName . ' files.';
+        $output .= PHP_EOL . 'Successfully deleted ' . $moduleName . ' shipping.';
         return $output;
     }
 }

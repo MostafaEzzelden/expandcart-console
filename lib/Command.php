@@ -11,6 +11,4 @@ abstract class Command
     }
 
     public abstract function help(array $arguments);
-
-    
 }
