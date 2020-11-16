@@ -10,7 +10,7 @@ class Reader
 
     public function __construct(string $baseTemplateDir)
     {
-        $this->baseTemplateDir = $baseTemplateDir;
+        $this->baseTemplateDir = rtrim($baseTemplateDir, '/');
     }
 
     public function setModuleName(string $moduleName)
@@ -89,7 +89,7 @@ class Reader
             return "There was a problem (permissions?) creating the file " . $pathToSave;
         }
 
-        return "Creating file - $pathToSave" ;
+        return "Creating file - $pathToSave";
     }
 
     private function deleteFile($path)
@@ -120,18 +120,17 @@ class Reader
     {
         $path =  str_replace($this->baseTemplateDir . '/' . $this->templateDir . '/', '', $path);
 
-        $path = str_replace('__dir__', $this->moduleName, $path);
-        $path = str_replace('__file__', $this->moduleName, $path);
+        $path = str_replace(['__dir__', '__file__'], $this->moduleName, $path);
 
-        $parts = explode('/', $path);
-        $filename = array_pop($parts);
+        $pathParts = explode('/', $path);
+        $filename = array_pop($pathParts);
 
-        $dir = Helper::getEnv('STORE_DIR') . implode('/', $parts);
+        $storeDir = Helper::getEnv('STORE_DIR') . implode('/', $pathParts);
 
-        if (!is_dir($dir))
-            mkdir($dir, 0775, true);
+        if (!is_dir($storeDir))
+            mkdir($storeDir, 0775, true);
 
-        $path = $dir . '/' . $filename;
+        $path = "$storeDir/$filename";
 
         return $path;
     }
