@@ -1,0 +1,330 @@
+{% extends "base.expand" %}
+{% from "controls/breadcrumb.expand" import breadcrumb as breadcrumb %}
+{% import "controls/forms.expand" as forms %}
+
+{% block title %}
+{{ lang('create_shipment') }}
+{% endblock title %}
+
+{% block breadcrumb %}
+{{ breadcrumb(breadcrumbs) }}
+{% endblock breadcrumb %}
+
+{% block headelements %}
+{% if shipment_details is not defined %}
+<a onclick="$('#create-shipment').submit()"
+    class="btn btn-primary btn-ladda btn-ladda-spinner top-save-button ladda-button">{{ lang('create_shipment') }}</a>
+{% endif %}
+{% endblock headelements %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="post" class="form" id="create-shipment" novalidate="novalidate"
+    action="{{ create_shipment_link }}">
+
+    <input type="hidden" name="order_id" value="{{ order_info['order_id'] }}" />
+    <input type="hidden" name="payment_code" value="{{ order_info['payment_code'] }}" />
+
+    <div class="row">
+        <!-- Customer Details -->
+        <div class="col-md-6">
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title">
+                        <span class="text-bold">
+                            {{ shipment_details is defined ? lang('shipment_details') : lang('customer_details') }}
+                        </span>
+                    </h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="collapse in" id="fields-panel">
+                        {% if shipment_details is defined %}
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>{{ lang('order_id') }}</td>
+                                <td>{{ shipment_details['id'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('customer_name') }}</td>
+                                <td>{{ shipment_details['customerName'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('customer_language') }}</td>
+                                <td>{{ languages[shipment_details['customerLang']]['name'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('customer_phone') }}</td>
+                                <td>{{ shipment_details['customerPhone'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('promise_time') }}</td>
+                                <td>{{ shipment_details['promiseTime'] }} {{ lang('minute') }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('preparation_time') }}</td>
+                                <td>{{ shipment_details['preparationTime'] }} {{ lang('minute') }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('branch_id') }}</td>
+                                <td>{{ shipment_details['branchId'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('time_of_order') }}</td>
+                                <td>{{ shipment_details['timeOfOrder'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('total_price') }}</td>
+                                <td>{{ shipment_details['totalPrice'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('payment_method') }}</td>
+                                <td>
+                                    {% for payment_method in payment_methods %}
+                                    {% if payment_method['value'] == shipment_details['paymentMethod'] %}
+                                    {{ payment_method['text'] }}
+                                    {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('notes') }}</td>
+                                <td>{{ shipment_details['notes'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('address') }}</td>
+                                <td>{{ shipment_details['address']['address'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ lang('address_notes') }}</td>
+                                <td>{{ shipment_details['address']['notes'] }}</td>
+                            </tr>
+                            {% if shipment_details['address']['coordinates']['lat'] and shipment_details['address']['coordinates']['lng'] %}
+                            <tr>
+                                <td>{{ lang('location') }}</td>
+                                <td>
+                                    <div id="order-map" style="height:250px"></div>
+                                </td>
+                                
+                            </tr>
+                            {% endif %}
+                        </table>
+
+                        {% else %}
+
+                        <!-- Language -->
+                        <input type="hidden" name="customer_language" value="{{ order_info['language_code'] }}" />
+                        <!-- Language -->
+
+                        {# <!-- Address coordinates -->
+                        <input type="hidden" name="coordinates" value="{{ order_info['shipping_address_location'] }}" />
+                        <!-- Address coordinates --> #}
+
+                        <!-- Name -->
+                        <div class="form-group col-md-6">
+                            <label for="customer_name" class="control-label">{{ lang('customer_name') }} <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="customer_name" name="customer_name"
+                                value="{{ order_info['firstname'] }} {{ order_info['lastname'] }}">
+                        </div>
+                        <!-- Name -->
+
+                        <!-- Phone -->
+                        <div class="form-group col-md-6">
+                            <label for="customer_phone" class="control-label">{{ lang('customer_phone') }}
+                                <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="customer_phone" name="customer_phone"
+                                value="{{ order_info['telephone'] }}">
+                        </div>
+                        <!-- Phone -->
+
+                        <!-- Total price -->
+                        <div class="form-group col-md-6">
+                            <label for="total_price" class="control-label">{{ lang('total_price') }}
+                                <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="total_price" name="total_price"
+                                value="{{ order_info['total'] }}" min="0">
+                        </div>
+                        <!-- Total price -->
+
+                        <!-- Notes -->
+                        <div class="form-group col-md-12">
+                            <label for="notes" class="control-label">{{ lang('notes') }}</label>
+                            <textarea class="form-control" id="notes"
+                                name="notes">{{ order_info['comment'] }}</textarea>
+                        </div>
+                        <!-- Notes -->
+
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+            {% if shipment_details is not defined %}
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('address_details') }}</span></h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="collapse in" id="fields-panel">
+
+                        <!-- Address -->
+                        <div class="form-group col-md-12" id="address_text-group" >
+                            <label for="address_text" class="control-label">{{ lang('address') }}&nbsp;<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="address_text" name="address[text]" value="{{ shipping_address }}">
+                            <span class="help-block"></span>
+                        </div>
+                        <!-- Address -->
+                        
+                        <!-- lat -->
+                        <div class="form-group col-md-12" id="address_lat-group" >
+                            <label for="address_lat" class="control-label">{{ lang('address_lat') }}&nbsp;<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="address_lat" name="address[lat]" value="{{ order_info['shipping_address_location']['lat'] }}">
+                            <span class="help-block"></span>
+                        </div>
+                        <!-- lat -->
+                        
+                        <!-- lng -->
+                        <div class="form-group col-md-12" id="address_lng-group" >
+                            <label for="address_lng" class="control-label">{{ lang('address_lng') }}&nbsp;<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="address_lng" name="address[lng]" value="{{ order_info['shipping_address_location']['lng'] }}">
+                            <span class="help-block"></span>
+                        </div>
+                        <!-- lng -->
+
+                        <!-- Address Notes -->
+                        <div class="form-group col-md-12">
+                            <label for="address_notes"
+                                class="control-label">{{ lang('address_notes') }}</label>
+                            <textarea class="form-control" id="address_notes"
+                                name="address[notes]"></textarea>
+                        </div>
+                        <!-- Address Notes -->
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+        <!-- Customer Details -->
+
+        <div class="col-md-6">
+            
+            <!-- Products Details -->
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('products_details') }}</span></h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="collapse in" id="fields-panel">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <th>{{ lang('product_name') }}</th>
+                                <th>{{ lang('product_quantity') }}</th>
+                            </thead>
+                            <tbody>
+
+                                {% set qty = 0 %}
+
+                                {% for product in products %}
+
+                                <tr id="item{{ product['order_product_id'] }}" style="width: 100%;">
+
+                                    <td>
+                                        <span title="{{ product['name'] }}">{{ product['name'] }}</span>
+                                        <input type="hidden" value="{{ product['quantity'] }}"
+                                            name="product[{{ product['order_product_id'] }}]">
+                                    </td>
+
+                                    <td>
+                                        <label class="label label-success" style="padding:5px 10px">
+                                            {{ product['quantity'] }} </label>
+                                    </td>
+                                </tr>
+
+                                {% set qty = qty + product['quantity'] %}
+
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Products Details -->
+
+            {% if shipment_details is defined %}
+            <input type="hidden" name="id" id="id" value="{{ shipment_details['id'] }}" />
+           
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('detailed_track_order') }}</span>
+                    </h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group col-md-12">
+                        <button id="track-order" class="btn btn-success"
+                            type="button">{{ lang('track_order') }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('cancel_order') }}</span></h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <input type="hidden" name="id" value="{{ shipment_details['id'] }}" />
+                    <div class="form-group col-md-12">
+                        <label for="cancel_notes">{{ lang('cancel_notes') }}</label>
+                            <textarea id="cancel_notes" name="cancel_notes" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <button id="cancel-order" class="btn btn-danger"
+                            type="button">{{ lang('cancel') }}</button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% if shipment_details is not defined %}
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <hr />
+            <a onclick="$('#create-shipment').submit()"
+                class="btn btn-primary btn-ladda btn-ladda-spinner top-save-button ladda-button">{{ lang('create_shipment') }}</a>
+        </div>
+    </div>
+    {% endif %}
+
+</form>
+
+{% endblock content %}

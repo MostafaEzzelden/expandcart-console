@@ -1,0 +1,110 @@
+{# Start Form #}
+<form class="form" action="{{ link('shipping/__name__') }}">
+    <div class="row">
+        <div class="col-md-3">
+            {# Status #}
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('entry_status')|trim(':') }}</span></h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="collapse in" id="panel1">
+                        <div class="form-group" id="settings_status-group">
+                            <label class="control-label">{{ lang('entry_status') }}</label>
+                            <div class="checkbox checkbox-switchery">
+                                <label>
+                                    <input type="checkbox" onchange="changeStatus(this);" name="settings[status]"
+                                        class="switchery" {{ settings['status'] not in ['0', 0, 'off'] ? 'checked' }}>
+                                    <span
+                                        class="switchery-status">{{ settings['status'] not in ['0', 0, 'off'] ? lang('text_enabled') : lang('text_disabled') }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {# End of Status #}
+            
+            {# Contact #}
+            <div class="panel panel-white">
+                <!-- contact __name__ panel Heading-->
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('entry_contact')|trim(':') }}</span></h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- End of contact __name__ panel Heading -->
+                <div class="panel-body">
+                    <a target="_blank" href="https://">
+                        <img style="width: 100%" src="view/image/shipping/__name__.jpg">
+                    </a>
+                </div>
+            </div>
+            {# End of Contact #}
+        </div>
+
+        {# Fields #}
+        <div class="col-md-9">
+            {# Settings #}
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title"><span class="text-bold">{{ lang('head_settings') }}</span></h6>
+                    <div class="heading-elements not-collapsible">
+                        <ul class="icons-list">
+                            <li><a data-action="collapse" class=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group" id="settings_email-group">
+                        <label for="settings_email" class="control-label">{{ lang('entry_email') }}</label>&nbsp;<span
+                            class="text-danger">*</span>
+                        <input type="text" class="form-control" id="settings_email" name="settings[email]"
+                            value="{{ settings['email'] }}" placeholder="{{ lang('entry_email') }}"><span
+                            class="help-block"></span>
+                    </div>
+
+                    <div class="form-group" id="settings_password-group">
+                        <label for="settings_password" class="control-label">{{ lang('entry_password') }}</label>
+                        &nbsp;<span class="text-danger">*</span>
+                        <input type="password" class="form-control" id="settings_password" name="settings[password]"
+                            value="{{ settings['password'] }}" placeholder="{{ lang('entry_password') }}"><span
+                            class="help-block"></span>
+                    </div>
+                </div>
+            </div>
+            {# End of settings #}
+
+        </div>
+        {# End of Fields #}
+    </div>
+</form>
+{# End Form #}
+
+<script>
+
+    function changeStatus(checkbox) {
+        var self = $(checkbox);
+        var switch_status = self.siblings('.switchery-status');
+
+        if (self.is(':checked')) {
+            switch_status.html("{{ lang('text_enabled') }}");
+        }
+        else {
+            switch_status.html("{{ lang('text_disabled') }}");
+        }
+    }
+
+    $(function () {
+        $(".select").select2();
+    });
+
+</script>

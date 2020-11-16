@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+
+<?php
+
+require_once 'lib/Autoloader.php';
+
+// include __DIR__ . '/Autoloader.php';
+
+/**
+ *
+ * How to run:
+ * php bin/console --help
+ */
+
+
+Console::run($argv);
