@@ -1,16 +1,28 @@
 <?php
 
-class Reader
+class TemplateManager
 {
-    protected $baseTemplateDir;
+    protected static $rootTemplateDir = __DIR__ . '/../tpl';
 
     protected $templateDir;
 
     protected $moduleName;
 
-    public function __construct(string $baseTemplateDir)
+    public function setRootTemplateDir(string $rootTemplateDir)
     {
-        $this->baseTemplateDir = rtrim($baseTemplateDir, '/');
+        static::$rootTemplateDir = $rootTemplateDir;
+    }
+
+    public function setTemplateDir(string $templateDir)
+    {
+        if (!is_dir($dir = static::$rootTemplateDir . '/' . $templateDir)) {
+            echo "Template not found $dir!";
+            exit;
+        }
+
+        $this->templateDir = $templateDir;
+
+        return $this;
     }
 
     public function setModuleName(string $moduleName)
@@ -20,12 +32,6 @@ class Reader
         return $this;
     }
 
-    public function setTemplateDir(string $templateDir)
-    {
-        $this->templateDir = $templateDir;
-
-        return $this;
-    }
 
     public function createResources()
     {
@@ -49,7 +55,7 @@ class Reader
 
     private function getFilesInDir($dirname)
     {
-        $scanDir = $this->baseTemplateDir . '/' . $dirname;
+        $scanDir = static::$rootTemplateDir . '/' . $dirname;
 
         $handle = opendir($scanDir);
 
@@ -118,7 +124,7 @@ class Reader
 
     private function resolvePathToStore(string $path)
     {
-        $path =  str_replace($this->baseTemplateDir . '/' . $this->templateDir . '/', '', $path);
+        $path =  str_replace(static::$rootTemplateDir . '/' . $this->templateDir . '/', '', $path);
 
         $path = str_replace(['__dir__', '__file__'], $this->moduleName, $path);
 

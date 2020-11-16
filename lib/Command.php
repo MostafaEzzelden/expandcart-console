@@ -3,11 +3,11 @@
 
 abstract class Command
 {
-    protected $reader;
+    protected $templateManager;
 
     public function __construct()
     {
-        $this->reader = new Reader(__DIR__ . '/../tpl');
+        $this->templateManager = new TemplateManager;
     }
 
     public abstract function help(array $arguments);

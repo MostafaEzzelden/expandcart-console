@@ -18,8 +18,7 @@ class ShippingCommand extends Command
         if (empty($moduleName) || $moduleName == "--help")
             return $this->help($arguments);
 
-        $output = $this->reader
-            ->setTemplateDir('shipping')
+        $output = $this->templateManager->setTemplateDir('shipping')
             ->setModuleName($moduleName)
             ->createResources();
 
@@ -33,8 +32,7 @@ class ShippingCommand extends Command
         if (empty($moduleName) || $moduleName == "--help")
             return $this->help($arguments);
 
-        $output = $this->reader
-            ->setTemplateDir('shipping')
+        $output = $this->templateManager->setTemplateDir('shipping')
             ->setModuleName($moduleName)
             ->deleteResources();
 
