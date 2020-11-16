@@ -1,6 +1,14 @@
 # expandcartdev@bin
 Expand Cart Console commands
 
+## Installation
+```bash
+git clone https://github.com/MostafaEzzelden/expandcart-console.git bin
+```
+```bash
+# copy .env.example to .env and update environments
+cd bin/ && cp .env.example .env
+```
 
 ## Usage 
 
