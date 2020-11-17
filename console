@@ -12,4 +12,8 @@ require_once 'lib/Autoloader.php';
  */
 
 
-Console::run($argv);
+$app = new Application;
+
+$response = $app->run($argv);
+
+$response->send();

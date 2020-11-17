@@ -1,11 +1,13 @@
 <?php
 
 
-class Console
-{
-    private function execute(array $arguments)
+class Console extends Service
+{ 
+    private $arguments;
+
+    public function send()
     {
-        $firstArg = array_reverse(explode(':', $arguments[0]));
+        $firstArg = array_reverse(explode(':', $this->arguments[0]));
 
         if (!class_exists($class = ucfirst($firstArg[0]) . 'Command')) {
             $class = 'HelpCommand';
@@ -18,17 +20,19 @@ class Console
         else
             $method = $firstArg[1];
 
-        $output = $class->$method(array_values(array_slice($arguments, 1, count($arguments) - 1, true)));
+        $output = $class->$method(array_values(array_slice($this->arguments, 1, count($this->arguments) - 1, true)));
+
         echo $output . PHP_EOL;
-        exit;
     }
 
-    public static function run($arguments)
+    public function prepare($arguments)
     {
         $arguments = array_values(array_slice($arguments, 1, count($arguments) - 1, true));
 
         if (empty($arguments)) array_push($arguments, 'help');
 
-        (new static)->execute($arguments);
+        $this->arguments = $arguments;
+
+        return $this;
     }
 }
