@@ -39,7 +39,7 @@ class ServiceContainer
     
     public function get($id)
     {
-        // Create the service if not already availabe
+        // Create the service if not already available
         
         if(!isset($this->services[$id]) && isset($this->constructors[$id]))
         {

@@ -1,9 +1,5 @@
 #!/usr/bin/env php
-
 <?php
-
-require_once 'lib/Autoloader.php';
-
 
 /**
  *
@@ -11,9 +7,32 @@ require_once 'lib/Autoloader.php';
  * php bin/console --help
  */
 
+ob_start();
+
+// -----
+
+// Error displaying (comment the following to turn on error displaying)
+
+error_reporting(0);
+
+// Constants
+
+define('ROOT_DIR', dirname(__FILE__));
+
+// Imports
+
+require_once 'lib/Autoloader.php';
+
+
+
+// Run the app
 
 $app = new Application;
 
 $response = $app->run($argv);
 
 $response->send();
+
+// -----
+
+ob_end_flush();

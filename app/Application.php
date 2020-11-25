@@ -22,6 +22,7 @@ class Application
     public function config()
     {
         $this->services->registerService('console', 'Console');
+        $this->services->registerService('templateManager', 'TemplateManager');
         // $this->services->registerService('config', 'Configuration');
         // $this->services->registerService('logger', 'Logger');
         // $this->services->registerService('stats', 'Statistics');

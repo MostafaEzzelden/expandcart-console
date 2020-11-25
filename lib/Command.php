@@ -3,11 +3,16 @@
 
 abstract class Command
 {
-    protected $templateManager;
+    protected $services;
 
-    public function __construct()
+    public function setServiceContainer($container)
     {
-        $this->templateManager = new TemplateManager;
+        $this->services = $container;
+    }
+
+    public function get($serviceId)
+    {
+        return $this->services->get($serviceId);
     }
 
     public abstract function help(array $arguments);

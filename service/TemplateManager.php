@@ -1,21 +1,17 @@
 <?php
 
-class TemplateManager
+class TemplateManager extends Service
 {
-    protected static $rootTemplateDir = __DIR__ . '/../tpl';
+    const ROOT_TEMPLATE_DIR = ROOT_DIR . '/tpl';
 
     protected $templateDir;
 
     protected $moduleName;
 
-    public function setRootTemplateDir(string $rootTemplateDir)
-    {
-        static::$rootTemplateDir = $rootTemplateDir;
-    }
 
     public function setTemplateDir(string $templateDir)
     {
-        if (!is_dir($dir = static::$rootTemplateDir . '/' . $templateDir)) {
+        if (!is_dir($dir = self::ROOT_TEMPLATE_DIR . '/' . $templateDir)) {
             echo "Template not found $dir!";
             exit;
         }
@@ -36,7 +32,7 @@ class TemplateManager
     public function createResources()
     {
         $output = "";
-        foreach ($this->getFilesInDir($this->templateDir) as $path) {
+        foreach ($this->files($this->templateDir) as $path) {
             $output .= $this->copyFile($path) . PHP_EOL;
         }
 
@@ -46,16 +42,19 @@ class TemplateManager
     public function deleteResources()
     {
         $output = "";
-        foreach ($this->getFilesInDir($this->templateDir) as $path) {
+        foreach ($this->files($this->templateDir) as $path) {
             $output .= $this->deleteFile($path) . PHP_EOL;
         }
 
         return $output;
     }
 
-    private function getFilesInDir($dirname)
+    /**
+     * @return \Generator|string[]
+     */
+    private function files($dirname)
     {
-        $scanDir = static::$rootTemplateDir . '/' . $dirname;
+        $scanDir = self::ROOT_TEMPLATE_DIR . '/' . $dirname;
 
         $handle = opendir($scanDir);
 
@@ -69,11 +68,11 @@ class TemplateManager
 
             // if dir found call again recursively
             if (is_dir($file)) {
-                foreach ($this->getFilesInDir($dirname . '/' . $fileItem) as $childFileItem) {
-                    yield $childFileItem;
+                foreach ($this->files($dirname . '/' . $fileItem) as $file) {
+                    yield trim($file);
                 }
             } else {
-                yield $file;
+                yield trim($file);
             }
         }
 
@@ -124,7 +123,7 @@ class TemplateManager
 
     private function resolvePathToStore(string $path)
     {
-        $path =  str_replace(static::$rootTemplateDir . '/' . $this->templateDir . '/', '', $path);
+        $path =  str_replace(self::ROOT_TEMPLATE_DIR . '/' . $this->templateDir . '/', '', $path);
 
         $path = str_replace(['__dir__', '__file__'], $this->moduleName, $path);
 
