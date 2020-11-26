@@ -4,7 +4,7 @@
 /**
  *
  * How to run:
- * php bin/console --help
+ * php console --help
  */
 
 ob_start();
@@ -24,14 +24,19 @@ define('ROOT_DIR', dirname(__FILE__));
 require_once 'lib/Autoloader.php';
 
 
-
 // Run the app
+try {
 
-$app = new Application;
+    $app = new Application;
 
-$response = $app->run($argv);
+    $response = $app->run($argv);
 
-$response->send();
+    $output = $response->output();
+
+    echo $output . PHP_EOL;
+} catch (\Throwable $th) {
+    var_dump($th);
+}
 
 // -----
 

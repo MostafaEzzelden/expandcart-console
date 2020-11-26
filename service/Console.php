@@ -3,57 +3,49 @@
 
 class Console extends Service
 {
+    const HELP_COMMAND = "HelpCommand";
+    const HELP_ACTION = "help";
+
     private $arguments;
-    private $command;
-    private $parameters;
+    private $output;
 
     public function prepare($arguments): self
     {
         $arguments = array_values(array_slice($arguments, 1, count($arguments) - 1, true));
 
-        if (empty($arguments)) array_push($arguments, 'help');
+        if (empty($arguments)) array_push($arguments, self::HELP_ACTION);
 
         $this->arguments = $arguments;
 
-        $this->prepareCommand()
-            ->prepareAction()
-            ->prepareParameters();
+        $this->output = call_user_func_array($this->prepareCommand(), $this->prepareParameters());
 
         return $this;
-    }
-
-    public function send()
-    {
-        $output = call_user_func_array([$this->command, $this->action], [$this->parameters]);
-        echo $output . PHP_EOL;
     }
 
     private function prepareCommand()
     {
-        $commandName = array_reverse(explode(':', $this->arguments[0]))[0];
+        $commandParts = array_reverse(explode(':', $this->arguments[0]));
 
-        if (!class_exists($commandName = ucfirst($commandName) . 'Command'))
-            $commandName = 'HelpCommand';
+        if (!class_exists($commandName = ucfirst($commandParts[0]) . 'Command'))
+            $commandName = self::HELP_COMMAND;
 
-        $this->command =  new $commandName;
-        $this->command->setServiceContainer($this->services);
-        return $this;
-    }
+        $command = new $commandName();
+        $command->setServiceContainer($this->getServiceContainer());
 
-    private function prepareAction()
-    {
-        $command = array_reverse(explode(':', $this->arguments[0]));
-        $action = !isset($command[1]) ? 'help' : $command[1];
+        $action = !isset($commandParts[1]) ? self::HELP_ACTION : $commandParts[1];
 
-        if ($this->command && !method_exists($this->command, $action)) $action = 'help';
+        if (!method_exists($command, $action)) $action = self::HELP_ACTION;
 
-        $this->action = $action;
-
-        return $this;
+        return [$command, $action];
     }
 
     private function prepareParameters()
     {
-        $this->parameters = array_values(array_slice($this->arguments, 1, count($this->arguments) - 1, true));
+        return  [array_values(array_slice($this->arguments, 1, count($this->arguments) - 1, true))];
+    }
+    
+    public function output()
+    {
+        return $this->output;
     }
 }

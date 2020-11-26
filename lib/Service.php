@@ -6,15 +6,20 @@ class Service
 {
     // Fields
 
-    protected $services;
+    private $container;
 
     // Methods
 
     public function setServiceContainer($container)
     {
-        $this->services = $container;
+        $this->container = $container;
 
         $this->onRegister();
+    }
+
+    public function getServiceContainer()
+    {
+        return $this->container;
     }
 
     public function onRegister()
@@ -27,11 +32,6 @@ class Service
 
     public function get($serviceId)
     {
-        return $this->services->get($serviceId);
-    }
-
-    public function getApp()
-    {
-        return $this->services->getApp();
+        return $this->container->get($serviceId);
     }
 }

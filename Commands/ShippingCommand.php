@@ -14,14 +14,12 @@ class ShippingCommand extends Command
 
     public function create($arguments)
     {
-
         $moduleName = isset($arguments[0]) ? trim($arguments[0]) : null;
         if (empty($moduleName) || $moduleName == "--help")
             return $this->help($arguments);
 
-        $templateManager = $this->get('templateManager');
-
-        $output = $templateManager->setTemplateDir('shipping')
+        $output = $this->get('templateManager')
+            ->setTemplateDir('tpl/shipping')
             ->setModuleName($moduleName)
             ->createResources();
 
@@ -35,9 +33,7 @@ class ShippingCommand extends Command
         if (empty($moduleName) || $moduleName == "--help")
             return $this->help($arguments);
 
-        $templateManager = $this->get('templateManager');
-
-        $output = $templateManager->setTemplateDir('shipping')
+        $output = $this->get('templateManager')->setTemplateDir('tpl/shipping')
             ->setModuleName($moduleName)
             ->deleteResources();
 

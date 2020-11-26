@@ -3,16 +3,21 @@
 
 abstract class Command
 {
-    protected $services;
+
+    // Fields
+    private $container;
+
+    // Methods
 
     public function setServiceContainer($container)
     {
-        $this->services = $container;
+        $this->container = $container;
     }
+
 
     public function get($serviceId)
     {
-        return $this->services->get($serviceId);
+        return $this->container->get($serviceId);
     }
 
     public abstract function help(array $arguments);

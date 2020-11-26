@@ -1,16 +1,15 @@
 <?php
 
-class Helper
+class Environment
 {
     const VARNAME_REGEX = '(?i:[A-Z][A-Z0-9_]*+)';
     const STATE_VARNAME = 0;
     const STATE_VALUE = 1;
 
-    protected static $path = __DIR__;
+    protected static $path = ROOT_DIR;
     protected static $envBag = null;
 
-
-    public static function getEnv($key, $default = null)
+    public static function get($key, $default = null)
     {
         if (is_null(static::$envBag)) {
             self::load();
@@ -19,11 +18,10 @@ class Helper
         return isset(static::$envBag[$key]) ? static::$envBag[$key] : $default;
     }
 
-
     private static function load()
     {
         static::$envBag = [];
-        $path = static::$path . '/../.env';
+        $path = static::$path . '/.env';
         if (!is_readable($path) || is_dir($path)) {
             echo "File not readable!";
             exit;
@@ -68,7 +66,6 @@ class Helper
 
         return $values;
     }
-
 
     private static function lexVarname(&$data, &$cursor, &$lineno, &$end)
     {

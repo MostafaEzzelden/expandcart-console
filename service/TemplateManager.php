@@ -2,17 +2,20 @@
 
 class TemplateManager extends Service
 {
-    const ROOT_TEMPLATE_DIR = ROOT_DIR . '/tpl';
+    private $templateDir;
+    private $moduleName;
 
-    protected $templateDir;
+    public function onRegister()
+    {
+        parent::onRegister();
 
-    protected $moduleName;
-
+        $this->fileManager = $this->get('fileManager');
+    }
 
     public function setTemplateDir(string $templateDir)
     {
-        if (!is_dir($dir = self::ROOT_TEMPLATE_DIR . '/' . $templateDir)) {
-            echo "Template not found $dir!";
+        if (!is_dir(ROOT_DIR . '/' . $templateDir)) {
+            echo "Unable to open $templateDir!";
             exit;
         }
 
@@ -28,13 +31,20 @@ class TemplateManager extends Service
         return $this;
     }
 
-
     public function createResources()
     {
         $output = "";
-        foreach ($this->files($this->templateDir) as $path) {
-            $output .= $this->copyFile($path) . PHP_EOL;
+        foreach ($this->fileManager->files($this->templateDir) as $path) {
+            $fileContents = $this->formatFileContents($this->fileManager->read($path));
+
+            $pathToSave = $this->resolvePathToStore($path);
+
+            if ($this->fileManager->create($pathToSave, $fileContents) === false)
+                $output .= "There was a problem (permissions?) creating the file $pathToSave\n";
+            else
+                $output .= "Creating file - $pathToSave\n";
         }
+
 
         return $output;
     }
@@ -42,66 +52,28 @@ class TemplateManager extends Service
     public function deleteResources()
     {
         $output = "";
-        foreach ($this->files($this->templateDir) as $path) {
+        foreach ($this->fileManager->files($this->templateDir) as $path)
             $output .= $this->deleteFile($path) . PHP_EOL;
-        }
 
         return $output;
     }
 
-    /**
-     * @return \Generator|string[]
-     */
-    private function files($dirname)
-    {
-        $scanDir = self::ROOT_TEMPLATE_DIR . '/' . $dirname;
+    // private function getFileContents($path)
+    // {
+    //     $contents = $this->formatFileContents(file_get_contents($path));
+    //     return $contents;
+    // }
 
-        $handle = opendir($scanDir);
+    // private function copyFile($path)
+    // {
 
-        if (!$handle) return [];
-
-        while (($fileItem = readdir($handle)) !== false) {
-            // skip '.' and '..'
-            if (($fileItem == '.') || ($fileItem == '..')) continue;
-
-            $file = rtrim($scanDir, '/') . '/' . $fileItem;
-
-            // if dir found call again recursively
-            if (is_dir($file)) {
-                foreach ($this->files($dirname . '/' . $fileItem) as $file) {
-                    yield trim($file);
-                }
-            } else {
-                yield trim($file);
-            }
-        }
-
-        closedir($handle);
-    }
-
-    private function getFileContents($path)
-    {
-        return $this->formatFileContents(file_get_contents($path));
-    }
-
-    private function copyFile($path)
-    {
-        $fileContents = $this->getFileContents($path);
-
-        $pathToSave = $this->resolvePathToStore($path);
-
-        if (file_put_contents($pathToSave, $fileContents) === false) {
-            return "There was a problem (permissions?) creating the file " . $pathToSave;
-        }
-
-        return "Creating file - $pathToSave";
-    }
+    // }
 
     private function deleteFile($path)
     {
         $pathToDelete = $this->resolvePathToStore($path);
 
-        if (!is_file($pathToDelete) || unlink($pathToDelete) === false) {
+        if (!$this->fileManager->delete($pathToDelete)) {
             return "Unable to delete the file " . $pathToDelete;
         }
 
@@ -123,14 +95,14 @@ class TemplateManager extends Service
 
     private function resolvePathToStore(string $path)
     {
-        $path =  str_replace(self::ROOT_TEMPLATE_DIR . '/' . $this->templateDir . '/', '', $path);
+        $path =  str_replace(ROOT_DIR . '/' . $this->templateDir . '/', '', $path);
 
         $path = str_replace(['__dir__', '__file__'], $this->moduleName, $path);
 
         $pathParts = explode('/', $path);
         $filename = array_pop($pathParts);
 
-        $storeDir = Helper::getEnv('STORE_DIR') . implode('/', $pathParts);
+        $storeDir = Environment::get('STORE_DIR') . implode('/', $pathParts);
 
         if (!is_dir($storeDir))
             mkdir($storeDir, 0775, true);
