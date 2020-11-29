@@ -1,0 +1,155 @@
+{% extends "base.expand" %}
+{% from "controls/breadcrumb.expand" import breadcrumb as breadcrumb %}
+{% import "controls/forms.expand" as forms %}
+
+{% block title %}
+{{ lang('heading_title') }}
+{% endblock title %}
+
+{% block breadcrumb %}
+{{ breadcrumb(breadcrumbs) }}
+{% endblock breadcrumb %}
+
+{% block headelements %}
+{% include "includes/buttons_top.expand" %}
+{% endblock headelements %}
+
+{% block content %}
+
+{% if settings is defined %}
+<!-- form app settings -->
+<form action="{{ action }}" method="post" class="form">
+    {# status #}
+    <div class="col-md-3">
+        <div class="panel panel-flat">
+            <div class="panel-body">
+                <fieldset>
+                    <legend class="text-semibold">
+                        <i class="fas fa-check-circle fa-lg position-left"></i>
+                        {{ lang('text_status') }}
+                        <a class="control-arrow" data-toggle="collapse" data-target="#panel1">
+                            <i class="icon-circle-down2"></i>
+                        </a>
+                    </legend>
+                    <div class="collapse in" id="panel1" style="text-align:center;">
+                        <div class="form-group">
+                            <label class="control-label">
+                                {{ lang('text_status') }}
+                            </label>
+                            <div class="checkbox checkbox-switchery no-margin">
+                                <label>
+                                    <input type="checkbox" onchange="changeStatus(this);" name="status"
+                                        class="switchery" {{ settings['status'] == '1' ? 'checked' }}>
+                                    <span class="switchery-status">
+                                        {% if settings['status'] == '1' %}
+                                        {{ lang('text_enabled') }}
+                                        {% else %}
+                                        {{ lang('text_disabled') }}
+                                        {% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            <span class="help-block"></span>
+                            <span class="text-muted">{{ langempty('entry_status_help') }}</span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    {# /status #}
+    <div class="col-md-9">
+        {# settings  #}
+        <div class="panel panel-flat">
+            <div class="panel-body">
+                <fieldset>
+                    <legend class="text-semibold">
+                        <i class="fas fa-server fa-lg position-left"></i>
+                        {{ lang('entry_settings_heading') }}
+                        <a class="control-arrow" data-toggle="collapse" data-target="#panel2">
+                            <i class="icon-circle-down2"></i>
+                        </a>
+                    </legend>
+                    <div class="collapse in" id="panel2">
+                        <div class="row">
+                            <!-- url -->
+                            <div class="col-md-6">
+                                <div class="form-group" id="url-group">
+                                    <label for="url" class="control-label">{{ lang('entry_url') }}&nbsp;<span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="url" name="url"
+                                        value="{{ settings['url'] }}" placeholder="{{ lang('entry_url') }}">
+                                    <span class="text-muted">{{ langempty('entry_url_help') }}</span>
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                            <!-- /url -->
+                            <!-- database -->
+                            <div class="col-md-6">
+                                <div class="form-group" id="database-group">
+                                    <label for="database" class="control-label">{{ lang('entry_database') }}&nbsp;<span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="database" name="database"
+                                        value="{{ settings['database'] }}" placeholder="{{ lang('entry_database') }}">
+                                    <span class="help-block"></span>
+                                    <span class="text-muted">{{ langempty('entry_database_help') }}</span>
+                                </div>
+                            </div>
+                            <!-- /database -->
+                            <div class="clearfix"></div>
+                            <!-- username -->
+                            <div class="col-md-6">
+                                <div class="form-group" id="username-group">
+                                    <label for="username" class="control-label">{{ lang('entry_username') }}&nbsp;<span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="username" name="username"
+                                        value="{{ settings['username'] }}" placeholder="{{ lang('entry_username') }}">
+                                    <span class="help-block"></span>
+                                    <span class="text-muted">{{ langempty('entry_username_help') }}</span>
+                                </div>
+                            </div>
+                            <!-- /username -->
+                            <!-- password -->
+                            <div class="col-md-6">
+                                <div class="form-group" id="password-group">
+                                    <label for="password" class="control-label">{{ lang('entry_password') }}&nbsp;<span
+                                            class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        value="{{ settings['password'] }}" placeholder="{{ lang('entry_password') }}">
+                                    <span class="help-block"></span>
+                                    <span class="text-muted">{{ langempty('entry_password_help') }}</span>
+                                </div>
+                            </div>
+                            <!-- /password -->
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        {# /settings  #}
+    </div>
+</form>
+<!-- /form app settings -->
+{% else %}
+<div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i>
+    {{ lang('extension_not_active') }}
+</div>
+{% endif %}
+<script type="text/javascript">
+    function changeStatus(checkbox) {
+        var self = $(checkbox);
+        var switch_status = self.siblings('.switchery-status');
+        if (self.is(':checked')) {
+            switch_status.html("{{ lang('text_enabled') }}");
+        }
+        else {
+            switch_status.html("{{ lang('text_disabled') }}");
+        }
+    }
+
+    $(function () {
+        $(".select").select2({
+        });
+    })
+</script>
+{% endblock %}
