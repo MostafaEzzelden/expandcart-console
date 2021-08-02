@@ -7,17 +7,22 @@ class Console extends Service
     const HELP_ACTION = "help";
 
     private $arguments;
+    private $command;
+    private $parameters;
+
     private $output;
 
-    public function prepare($arguments): self
+    public function run($arguments): self
     {
         $arguments = array_values(array_slice($arguments, 1, count($arguments) - 1, true));
 
         if (empty($arguments)) array_push($arguments, self::HELP_ACTION);
 
-        $this->arguments = $arguments;
+        $this->arguments  = $arguments;
+        $this->command    = $this->prepareCommand();
+        $this->parameters = $this->prepareParameters();
 
-        $this->output = call_user_func_array($this->prepareCommand(), $this->prepareParameters());
+        $this->output     = $this->command[0]->{$this->command[1]}(...$this->parameters);
 
         return $this;
     }
@@ -43,7 +48,7 @@ class Console extends Service
     {
         return  [array_values(array_slice($this->arguments, 1, count($this->arguments) - 1, true))];
     }
-    
+
     public function output()
     {
         return $this->output;

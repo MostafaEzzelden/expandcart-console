@@ -42,8 +42,13 @@ class FileManager extends Service
         return file_put_contents($path, $contents);
     }
 
-    public function delete($path)
+    public function has($filename)
     {
-        return is_file($path) && unlink($path) !== false;
+        return is_file($filename) && is_readable($filename);
+    }
+
+    public function delete($filename)
+    {
+        return $this->has($filename) && unlink($filename) !== false;
     }
 }

@@ -10,7 +10,8 @@ class Statistics extends Service
 
     public function onRemove()
     {
-        $this->get('logger')->info($this->getDataString());
+        $this->container->logger->info($this->getDataString());
+        
         parent::onRemove();
     }
 

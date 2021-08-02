@@ -1,24 +1,7 @@
 <?php
 
 
-abstract class Command
+abstract class Command extends Service
 {
-
-    // Fields
-    private $container;
-
-    // Methods
-
-    public function setServiceContainer($container)
-    {
-        $this->container = $container;
-    }
-
-
-    public function get($serviceId)
-    {
-        return $this->container->get($serviceId);
-    }
-
     public abstract function help(array $arguments);
 }

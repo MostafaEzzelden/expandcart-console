@@ -2,30 +2,29 @@
 
 class Application
 {
-    private $serviceContainer;
+    private $container;
 
     /**
      *  Constructor
      */
     public function __construct()
     {
-        $this->serviceContainer = ServiceContainer::getInstance();
-        $this->serviceContainer->setApp($this);
+        $this->container = ServiceContainer::getInstance();
 
         // Setup the services
 
-        $this->serviceContainer->registerService('config', 'Configuration');
-        $this->serviceContainer->registerService('logger', 'Logger');
-        $this->serviceContainer->registerService('stats', 'Statistics');
-        $this->serviceContainer->registerService('db', 'DB');
-        $this->serviceContainer->registerService('console', 'Console');
-        $this->serviceContainer->registerService('templateManager', 'TemplateManager');
-        $this->serviceContainer->registerService('fileManager', 'FileManager');
+        $this->container->set('config', 'Configuration');
+        $this->container->set('logger', 'Logger');
+        $this->container->set('stats', 'Statistics');
+        $this->container->set('db', 'DB');
+        $this->container->set('console', 'Console');
+        $this->container->set('templateManager', 'TemplateManager');
+        $this->container->set('fileManager', 'FileManager');
     }
 
     public function getServiceContainer()
     {
-        return $this->serviceContainer;
+        return $this->container;
     }
 
     /**
@@ -36,9 +35,9 @@ class Application
      */
     public function run($request)
     {
-        $response = $this->serviceContainer->get('console')->prepare($request);
+        $response = $this->container->get('console')->run($request);
 
-        $this->serviceContainer->clean();
+        $this->container->clean();
 
         // Return the response
 

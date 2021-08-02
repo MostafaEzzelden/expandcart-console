@@ -1,14 +1,10 @@
 <?php
 
-// Base class for all services implementing the Singleton pattern
+// Base class for all services
 
 class Service
 {
-    // Fields
-
-    private $container;
-
-    // Methods
+    public $container;
 
     public function setServiceContainer($container)
     {
@@ -24,14 +20,24 @@ class Service
 
     public function onRegister()
     {
+        //
     }
 
     public function onRemove()
     {
+        //
     }
 
-    public function get($serviceId)
-    {
-        return $this->container->get($serviceId);
-    }
+
+    /**
+     * Handle dynamic method calls into the method.
+     *
+     * @param  string $method
+     * @param  array $parameters
+     * @return mixed
+     */
+    // public function __call($method, $parameters)
+    // {
+    //     return call_user_func_array(array($this->serviceContainer, $method), $parameters);
+    // }
 }

@@ -4,7 +4,7 @@ class ServiceContainer
 {
     private static $instance = null;
 
-    private $app = null;
+    // private $app = null;
 
     private $services = [];
 
@@ -26,51 +26,46 @@ class ServiceContainer
 
     // Methods
 
-    public function setApp($app)
-    {
-        $this->app = $app;
-    }
-
-    public function getApp()
-    {
-        return $this->app;
-    }
-
     public function get($id)
     {
-        // Create the service if not already available
-
         if (is_array($this->services[$id])) {
             $this->services[$id] = new $this->services[$id][0](...$this->services[$id][1]);
             $this->services[$id]->setServiceContainer($this);
         }
 
-        // Return the service
-
         return $this->services[$id];
     }
 
-    public function registerService(string $id, string $ServiceClass, array $opts = []): void
+    public function set(string $id, string $ServiceClass, array $opts = []): void
     {
-        // Store the service 
         $this->services[$id] = array($ServiceClass, $opts);
     }
 
-    public function registerServiceInstance($id, $instance)
+    public function setInstance($id, $instance)
     {
-        // Store the service instance
-
         $this->services[$id] = $instance;
     }
 
+    public function has($id)
+    {
+        return isset($this->services[$id]);
+    }
+
+
     public function clean()
     {
-        // Remove the registered services
-
         foreach ($this->services as $id => $service) {
             if (!is_array($service)) $service->onRemove();
         }
 
         $this->services = array();
+    }
+
+
+    public function __get($id)
+    {
+        if ($this->has($id)) return $this->get($id);
+
+        return null;
     }
 }

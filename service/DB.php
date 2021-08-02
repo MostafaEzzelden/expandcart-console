@@ -10,9 +10,6 @@ class DB extends Service
 
     private $pdo;
 
-    private $config;
-    private $logger;
-    private $stats;
     private $lastQuery;
 
     // Constructor
@@ -20,12 +17,6 @@ class DB extends Service
     public function onRegister()
     {
         parent::onRegister();
-
-        // -----
-        $this->config  = $this->get('config');
-        $this->stats   = $this->get('stats');
-        $this->logger  = $this->get('logger');
-
         $this->reconnect();
     }
 
@@ -50,15 +41,15 @@ class DB extends Service
     {
         $connection = sprintf(
             "mysql:dbname=%s;host=%s;port=%s",
-            $this->config->getConfig('database.connections.mysql.database'),
-            $this->config->getConfig('database.connections.mysql.host'),
-            $this->config->getConfig('database.connections.mysql.port')
+            $this->container->config->getConfig('database.connections.mysql.database'),
+            $this->container->config->getConfig('database.connections.mysql.host'),
+            $this->container->config->getConfig('database.connections.mysql.port')
         );
 
         return $this->connect(
             $connection,
-            $this->config->getConfig('database.connections.mysql.username'),
-            $this->config->getConfig('database.connections.mysql.password')
+            $this->container->config->getConfig('database.connections.mysql.username'),
+            $this->container->config->getConfig('database.connections.mysql.password')
         );
     }
 
@@ -83,7 +74,7 @@ class DB extends Service
                 if ($statement) {
                     $result = $result && $statement->execute($params);
 
-                    $this->stats->inc('db_queries');
+                    $this->container->stats->inc('db_queries');
                 }
             }
 
@@ -91,7 +82,7 @@ class DB extends Service
         } catch (Exception $e) {
             // Log
 
-            $this->logger->error($e->getMessage());
+            $this->container->logger->error($e->getMessage());
 
             return false;
         }
@@ -122,7 +113,7 @@ class DB extends Service
 
                     $result = $statement->fetchAll();
 
-                    $this->stats->inc('db_queries');
+                    $this->container->stats->inc('db_queries');
                 }
             }
 
@@ -130,7 +121,7 @@ class DB extends Service
         } catch (Exception $e) {
             // Log
 
-            $this->logger->error($e->getMessage());
+            $this->container->logger->error($e->getMessage());
 
             return false;
         }
@@ -150,14 +141,14 @@ class DB extends Service
             if ($statement) {
                 $statement->execute($params);
 
-                $this->stats->inc('db_queries');
+                $this->container->stats->inc('db_queries');
 
                 return $statement->fetch();
             }
         } catch (Exception $e) {
             // Log
 
-            $this->logger->error($e->getMessage());
+            $this->container->logger->error($e->getMessage());
 
             return false;
         }
@@ -184,7 +175,7 @@ class DB extends Service
         $result = [];
         $tables = $this->query('SHOW TABLES');
 
-        $this->stats->inc('db_queries');
+        $this->container->stats->inc('db_queries');
 
         if ($tables) {
             foreach ($tables as $tableInfo) {

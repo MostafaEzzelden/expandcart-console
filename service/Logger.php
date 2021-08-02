@@ -6,7 +6,6 @@ class Logger extends Service
     const ERROR   = 'error';
     const WARNING = 'warning';
 
-    protected $config;
     protected $logFilePath;
     protected $logErrors;
     protected $logWarnings;
@@ -19,14 +18,10 @@ class Logger extends Service
     {
         parent::onRegister();
 
-        // -----
-
-        $this->config      = $this->get('config');
-
-        $this->logFilePath = ROOT_DIR . '/' . $this->config->getConfig('services.logger.file');
-        $this->logErrors   = $this->config->getConfig('services.logger.log_errors');
-        $this->logWarnings = $this->config->getConfig('services.logger.log_warnings');
-        $this->logInfos    = $this->config->getConfig('services.logger.log_infos');
+        $this->logFilePath = ROOT_DIR . '/' . $this->container->config->getConfig('services.logger.file');
+        $this->logErrors   = $this->container->config->getConfig('services.logger.log_errors');
+        $this->logWarnings = $this->container->config->getConfig('services.logger.log_warnings');
+        $this->logInfos    = $this->container->config->getConfig('services.logger.log_infos');
     }
 
     public function error($message)

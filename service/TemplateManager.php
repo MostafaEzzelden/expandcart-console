@@ -3,13 +3,12 @@
 class TemplateManager extends Service
 {
     private $templateDir;
+
     private $moduleName;
 
     public function onRegister()
     {
         parent::onRegister();
-
-        $this->fileManager = $this->get('fileManager');
     }
 
     public function setTemplateDir(string $templateDir)
@@ -33,48 +32,49 @@ class TemplateManager extends Service
 
     public function createResources()
     {
-        $output = "";
-        foreach ($this->fileManager->files($this->templateDir) as $path) {
-            $fileContents = $this->formatFileContents($this->fileManager->read($path));
+        $output = [];
+
+        foreach ($this->container->fileManager->files($this->templateDir) as $path) {
 
             $pathToSave = $this->resolvePathToStore($path);
 
-            if ($this->fileManager->create($pathToSave, $fileContents) === false)
-                $output .= "There was a problem (permissions?) creating the file $pathToSave\n";
-            else
-                $output .= "Creating file - $pathToSave\n";
+            if ($this->container->fileManager->has($pathToSave)) {
+                continue;
+            }
+
+            $fileContents = $this->formatFileContents($this->container->fileManager->read($path));
+
+            if ($this->container->fileManager->create($pathToSave, $fileContents) === false) {
+                $this->container->logger->warning("There was a problem (permissions?) creating the file $pathToSave");
+                continue;
+            }
+
+            $output[] = "Creating file - $pathToSave";
         }
 
-
-        return $output;
+        return implode(PHP_EOL, $output);
     }
 
     public function deleteResources()
     {
-        $output = "";
-        foreach ($this->fileManager->files($this->templateDir) as $path)
-            $output .= $this->deleteFile($path) . PHP_EOL;
+        $output = [];
 
-        return $output;
+        foreach ($this->container->fileManager->files($this->templateDir) as $path) {
+            if ($success = $this->deleteFile($path)) {
+                $output[] = $success;
+            }
+        }
+
+        return implode(PHP_EOL, $output);
     }
-
-    // private function getFileContents($path)
-    // {
-    //     $contents = $this->formatFileContents(file_get_contents($path));
-    //     return $contents;
-    // }
-
-    // private function copyFile($path)
-    // {
-
-    // }
 
     private function deleteFile($path)
     {
         $pathToDelete = $this->resolvePathToStore($path);
 
-        if (!$this->fileManager->delete($pathToDelete)) {
-            return "Unable to delete the file " . $pathToDelete;
+        if (!$this->container->fileManager->delete($pathToDelete)) {
+            $this->container->logger->warning("Unable to delete the file " . $pathToDelete);
+            return false;
         }
 
         return "Deleting file - $pathToDelete";

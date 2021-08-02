@@ -14,7 +14,7 @@ class Configuration extends Service
     {
         $configBag = [];
 
-        foreach ($this->get('fileManager')->files('config') as $path) {
+        foreach ($this->container->fileManager->files('config') as $path) {
             $pathParts = pathinfo($path);
             if ($pathParts['extension'] !== 'php') continue;
             $configBag[$pathParts['filename']] = include $path;
